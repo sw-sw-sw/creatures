@@ -1,224 +1,171 @@
 <title>Particle Creature</title>
 <style>
   :root{
-    --bg:#0a0a0c;
-    --panel:#111114;
-    --border:#232329;
-    --text:#e9e7ef;
+    --bg:#090909;
+    --panel:#0e0e11;
+    --border:#222226;
+    --text:#eae8f0;
     --muted:#8b8a94;
     --accent:#cfc9ff;
-    --dot:#f4f2ff;
-  }
-  @media (prefers-color-scheme: light){
-    :root:not([data-theme="dark"]){
-      --bg:#f4f3f6;
-      --panel:#fbfaff;
-      --border:#dcdae3;
-      --text:#17161c;
-      --muted:#696873;
-      --accent:#5b4bd6;
-      --dot:#17161c;
-    }
-  }
-  :root[data-theme="light"]{
-    --bg:#f4f3f6;
-    --panel:#fbfaff;
-    --border:#dcdae3;
-    --text:#17161c;
-    --muted:#696873;
-    --accent:#5b4bd6;
-    --dot:#17161c;
-  }
-  :root[data-theme="dark"]{
-    --bg:#0a0a0c;
-    --panel:#111114;
-    --border:#232329;
-    --text:#e9e7ef;
-    --muted:#8b8a94;
-    --accent:#cfc9ff;
-    --dot:#f4f2ff;
+    --track:#232329;
   }
 
   *{box-sizing:border-box;}
-  body{
+  html,body{
     margin:0;
+    height:100%;
     background:var(--bg);
-    color:var(--text);
-    font-family:"Fraunces",Georgia,"Hiragino Mincho ProN",serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:22px;
-    padding:48px 16px 56px;
-    min-height:100dvh;
-  }
-
-  header{
-    text-align:center;
-    max-width:520px;
-  }
-  h1{
-    font-family:"Fraunces","Hiragino Mincho ProN",serif;
-    font-optical-sizing:auto;
-    font-style:italic;
-    font-weight:520;
-    font-size:clamp(28px,6vw,42px);
-    letter-spacing:0.01em;
-    margin:0 0 8px;
-    text-wrap:balance;
-    color:var(--text);
-  }
-  p.sub{
-    font-family:"JetBrains Mono","SF Mono",monospace;
-    font-size:12.5px;
-    line-height:1.7;
-    color:var(--muted);
-    margin:0;
-    letter-spacing:0.01em;
-  }
-
-  .stage{
-    position:relative;
-    width:min(88vw,440px);
-    aspect-ratio:1/1;
-    background:#09090b;
-    border:1px solid var(--border);
-    border-radius:6px;
-    box-shadow:0 30px 70px -35px rgba(0,0,0,0.55);
     overflow:hidden;
+  }
+  body{
+    display:flex;
+    flex-direction:row;
+    font-family:"JetBrains Mono","SF Mono",Menlo,monospace;
+    color:var(--text);
+  }
+
+  main{
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bg);
+    min-width:0;
+    min-height:0;
+    padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+  }
+  .stage{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
   canvas{
     display:block;
-    width:100%;
-    height:100%;
-  }
-  .stage-label{
-    position:absolute;
-    left:10px;
-    bottom:9px;
-    font-family:"JetBrains Mono",monospace;
-    font-size:10px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:rgba(233,231,239,0.55);
-    pointer-events:none;
   }
 
-  .meta{
-    width:min(88vw,440px);
+  aside{
+    flex:0 0 auto;
+    width:264px;
+    max-width:38vw;
+    height:100%;
+    background:var(--panel);
+    border-left:1px solid var(--border);
+    padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px)) 18px;
+    padding-right:calc(18px + env(safe-area-inset-right,0px));
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field .row{
     display:flex;
     justify-content:space-between;
-    font-family:"JetBrains Mono",monospace;
-    font-size:11px;
+    align-items:baseline;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
     color:var(--muted);
+  }
+  .field .row span.val{
+    color:var(--accent);
     font-variant-numeric:tabular-nums;
   }
-  .meta strong{
-    color:var(--accent);
-    font-weight:500;
-  }
 
-  details{
-    width:min(88vw,600px);
-    border:1px solid var(--border);
-    border-radius:6px;
-    background:var(--panel);
-    overflow:hidden;
-  }
-  summary{
-    cursor:pointer;
-    list-style:none;
-    padding:12px 16px;
-    font-family:"JetBrains Mono",monospace;
-    font-size:11.5px;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    color:var(--muted);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  summary::-webkit-details-marker{display:none;}
-  summary::after{
-    content:"表示";
-    color:var(--accent);
-    font-size:10.5px;
-  }
-  details[open] summary::after{content:"閉じる";}
-  pre{
+  input[type="range"]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:16px;
+    background:transparent;
     margin:0;
-    padding:0 16px 16px;
-    font-family:"JetBrains Mono",monospace;
-    font-size:11.5px;
-    line-height:1.65;
-    color:var(--text);
-    overflow-x:auto;
-    white-space:pre;
   }
-  pre .c{color:var(--muted);}
+  input[type="range"]::-webkit-slider-runnable-track{
+    height:2px;
+    background:var(--track);
+    border-radius:2px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:11px;
+    height:11px;
+    margin-top:-4.5px;
+    border-radius:50%;
+    background:var(--accent);
+    border:none;
+    cursor:pointer;
+  }
+  input[type="range"]::-moz-range-track{
+    height:2px;
+    background:var(--track);
+    border-radius:2px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background:var(--accent);
+    border:none;
+    cursor:pointer;
+  }
 
-  @media (prefers-reduced-motion: reduce){
-    canvas{filter:none;}
+  button#resetBtn{
+    margin-top:4px;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-family:inherit;
+    font-size:10.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:9px 10px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  button#resetBtn:hover{
+    color:var(--text);
+    border-color:var(--accent);
+  }
+
+  @media (max-width:700px){
+    body{flex-direction:column;}
+    aside{
+      width:100%;
+      max-width:none;
+      height:auto;
+      border-left:none;
+      border-top:1px solid var(--border);
+      flex-direction:row;
+      flex-wrap:wrap;
+      max-height:42vh;
+    }
+    .field{width:calc(50% - 8px);}
+    main{height:58vh;}
   }
 </style>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,420;1,9..144,560&family=JetBrains+Mono:wght@400;500&display=swap">
+<main>
+  <div class="stage"><canvas id="gl"></canvas></div>
+</main>
 
-<header>
-  <h1>Particle Creature</h1>
-  <p class="sub">10,000 points · triangle-function field · WebGL2</p>
-</header>
-
-<div class="stage">
-  <canvas id="gl"></canvas>
-  <div class="stage-label">gl.POINTS — 400×400 space</div>
-</div>
-
-<div class="meta">
-  <span>particles <strong id="countOut">10000</strong></span>
-  <span>Δt <strong>π/20</strong> / frame</span>
-  <span>t = <strong id="tOut">0.00</strong></span>
-</div>
-
-<details>
-  <summary>元コード / GLSL 変換</summary>
-  <pre><span class="c">// 元の p5.js ゴルフコード</span>
-a=(m,d=mag(k=9*cos(i*5)*sin(i),e=cos(i*3)*cos(i*2)*9)**3/1999+1.5-sin(t/2+m)**3/3)=>
-  point(99*sin(c=d/16-t/48+m)+k*(p=d**sin(d*d-t+m))+200,
-        99*sin(c*4)+e*p+200)
-t=0,draw=$=>{
-  t||createCanvas(w=400,w);
-  background(9).stroke(w,96);
-  for(t+=PI/20,i=1e4;i--;) a(i%16*13)
-}
-
-<span class="c">// 頂点シェーダーへの移植（gl_VertexID を i として使用）</span>
-float i = float(gl_VertexID);
-float m = mod(i, 16.0) * 13.0;
-float k = 9.0 * cos(i*5.0) * sin(i);
-float e = cos(i*3.0) * cos(i*2.0) * 9.0;
-float mg = sqrt(k*k + e*e);
-float d = pow(mg,3.0)/1999.0 + 1.5 - pow(sin(uT/2.0+m),3.0)/3.0;
-float c = d/16.0 - uT/48.0 + m;
-float p = pow(d, sin(d*d - uT + m));
-vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
-                 99.0*sin(c*4.0) + e*p + 200.0);</pre>
-</details>
+<aside id="panel"></aside>
 
 <script>
 (() => {
   const canvas = document.getElementById('gl');
   const gl = canvas.getContext('webgl2', { antialias: true, alpha: false });
   if (!gl) {
-    canvas.replaceWith(Object.assign(document.createElement('p'), {
-      textContent: 'WebGL2 に対応していないブラウザです。',
-      style: 'font-family:monospace;color:var(--muted);padding:40px;'
-    }));
+    document.querySelector('.stage').textContent = 'WebGL2 に対応していないブラウザです。';
     return;
   }
 
-  const COUNT = 10000;
   const SPACE = 400; // original createCanvas(400,400) coordinate space
 
   const vertSrc = `#version 300 es
@@ -226,21 +173,27 @@ vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
   uniform float uT;
   uniform vec2 uResolution;
   uniform float uPointSize;
+  uniform float uGroups;
+  uniform float uSpacing;
+  uniform float uSpike;
+  uniform float uAmp;
+  uniform float uYFreq;
+  uniform float uTwist;
 
   void main() {
     float i = float(gl_VertexID);
-    float m = mod(i, 16.0) * 13.0;
+    float m = mod(i, uGroups) * uSpacing;
 
-    float k = 9.0 * cos(i * 5.0) * sin(i);
-    float e = cos(i * 3.0) * cos(i * 2.0) * 9.0;
+    float k = uSpike * cos(i * 5.0) * sin(i);
+    float e = cos(i * 3.0) * cos(i * 2.0) * uSpike;
     float mg = sqrt(k * k + e * e);
 
     float d = pow(mg, 3.0) / 1999.0 + 1.5 - pow(sin(uT / 2.0 + m), 3.0) / 3.0;
-    float c = d / 16.0 - uT / 48.0 + m;
+    float c = d / 16.0 - uT / uTwist + m;
     float p = pow(d, sin(d * d - uT + m));
 
-    float x = 99.0 * sin(c) + k * p + 200.0;
-    float y = 99.0 * sin(c * 4.0) + e * p + 200.0;
+    float x = uAmp * sin(c) + k * p + 200.0;
+    float y = uAmp * sin(c * uYFreq) + e * p + 200.0;
 
     vec2 clip = (vec2(x, y) / uResolution) * 2.0 - 1.0;
     clip.y = -clip.y;
@@ -251,12 +204,13 @@ vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
 
   const fragSrc = `#version 300 es
   precision highp float;
+  uniform float uOpacity;
   out vec4 fragColor;
   void main() {
     vec2 uv = gl_PointCoord - 0.5;
     float d = length(uv);
     if (d > 0.5) discard;
-    float a = smoothstep(0.5, 0.15, d) * 0.376;
+    float a = smoothstep(0.5, 0.15, d) * uOpacity;
     fragColor = vec4(1.0, 1.0, 1.0, a);
   }`;
 
@@ -282,6 +236,13 @@ vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
   const uT = gl.getUniformLocation(prog, 'uT');
   const uResolution = gl.getUniformLocation(prog, 'uResolution');
   const uPointSize = gl.getUniformLocation(prog, 'uPointSize');
+  const uGroups = gl.getUniformLocation(prog, 'uGroups');
+  const uSpacing = gl.getUniformLocation(prog, 'uSpacing');
+  const uSpike = gl.getUniformLocation(prog, 'uSpike');
+  const uAmp = gl.getUniformLocation(prog, 'uAmp');
+  const uYFreq = gl.getUniformLocation(prog, 'uYFreq');
+  const uTwist = gl.getUniformLocation(prog, 'uTwist');
+  const uOpacity = gl.getUniformLocation(prog, 'uOpacity');
 
   gl.uniform2f(uResolution, SPACE, SPACE);
   gl.enable(gl.BLEND);
@@ -293,34 +254,120 @@ vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
 
   const bgVal = 9 / 255;
 
+  // ---- adjustable parameters ------------------------------------------
+  const DEFAULTS = {
+    particles: 10000,
+    speed:     1,
+    pointSize: 1.6,
+    opacity:   0.376,
+    groups:    16,
+    spacing:   13,
+    spike:     9,
+    amp:       99,
+    yFreq:     4,
+    twist:     48,
+  };
+  const FIELDS = [
+    { key: 'particles', label: 'パーティクル数', min: 500,  max: 20000, step: 100,  digits: 0 },
+    { key: 'speed',     label: '速度',           min: 0,    max: 3,     step: 0.05, digits: 2 },
+    { key: 'pointSize', label: '粒サイズ',        min: 0.5,  max: 4,     step: 0.1,  digits: 1 },
+    { key: 'opacity',   label: '不透明度',        min: 0.02, max: 1,     step: 0.01, digits: 2 },
+    { key: 'groups',    label: 'グループ数',      min: 2,    max: 64,    step: 1,    digits: 0 },
+    { key: 'spacing',   label: '間隔',            min: 1,    max: 40,    step: 0.5,  digits: 1 },
+    { key: 'spike',     label: '尖り',            min: 0,    max: 20,    step: 0.1,  digits: 1 },
+    { key: 'amp',       label: '半径',            min: 20,   max: 160,   step: 1,    digits: 0 },
+    { key: 'yFreq',     label: 'Y周波数',         min: 0.5,  max: 8,     step: 0.1,  digits: 1 },
+    { key: 'twist',     label: '捻れ',            min: 8,    max: 160,   step: 1,    digits: 0 },
+  ];
+
+  const params = { ...DEFAULTS };
+  const panel = document.getElementById('panel');
+  const valEls = {};
+
+  FIELDS.forEach(f => {
+    const field = document.createElement('div');
+    field.className = 'field';
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    const label = document.createElement('span');
+    label.textContent = f.label;
+    const val = document.createElement('span');
+    val.className = 'val';
+    val.textContent = params[f.key].toFixed(f.digits);
+    row.append(label, val);
+    valEls[f.key] = val;
+
+    const input = document.createElement('input');
+    input.type = 'range';
+    input.min = f.min;
+    input.max = f.max;
+    input.step = f.step;
+    input.value = params[f.key];
+    input.id = 'field-' + f.key;
+    input.addEventListener('input', () => {
+      params[f.key] = parseFloat(input.value);
+      valEls[f.key].textContent = params[f.key].toFixed(f.digits);
+    });
+
+    field.append(row, input);
+    panel.appendChild(field);
+    f.input = input;
+  });
+
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'resetBtn';
+  resetBtn.type = 'button';
+  resetBtn.textContent = 'リセット';
+  resetBtn.addEventListener('click', () => {
+    FIELDS.forEach(f => {
+      params[f.key] = DEFAULTS[f.key];
+      f.input.value = DEFAULTS[f.key];
+      valEls[f.key].textContent = DEFAULTS[f.key].toFixed(f.digits);
+    });
+  });
+  panel.appendChild(resetBtn);
+
+  // ---- render loop -------------------------------------------------------
   function resize() {
+    const stage = document.querySelector('.stage');
+    const rect = stage.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const size = Math.round(canvas.clientWidth * dpr);
-    if (canvas.width !== size || canvas.height !== size) {
-      canvas.width = size;
-      canvas.height = size;
-      gl.viewport(0, 0, size, size);
-      gl.uniform1f(uPointSize, Math.max(1.4, 1.6 * dpr));
+    const side = Math.max(1, Math.floor(Math.min(rect.width, rect.height)));
+    const px = Math.round(side * dpr);
+    canvas.style.width = side + 'px';
+    canvas.style.height = side + 'px';
+    if (canvas.width !== px || canvas.height !== px) {
+      canvas.width = px;
+      canvas.height = px;
+      gl.viewport(0, 0, px, px);
     }
+    canvas.dataset.dpr = dpr;
   }
 
   let t = 0;
-  const tOut = document.getElementById('tOut');
-  document.getElementById('countOut').textContent = COUNT.toLocaleString();
-
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const step = reduceMotion ? 0 : Math.PI / 20;
 
   function frame() {
     resize();
-    t += step;
+    const dpr = parseFloat(canvas.dataset.dpr) || 1;
+    if (!reduceMotion) t += (Math.PI / 20) * params.speed;
 
     gl.clearColor(bgVal, bgVal, bgVal, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(uT, t);
-    gl.drawArrays(gl.POINTS, 0, COUNT);
 
-    tOut.textContent = t.toFixed(2);
+    gl.uniform1f(uT, t);
+    gl.uniform1f(uPointSize, Math.max(1, params.pointSize * dpr));
+    gl.uniform1f(uGroups, Math.max(1, params.groups));
+    gl.uniform1f(uSpacing, params.spacing);
+    gl.uniform1f(uSpike, params.spike);
+    gl.uniform1f(uAmp, params.amp);
+    gl.uniform1f(uYFreq, params.yFreq);
+    gl.uniform1f(uTwist, params.twist === 0 ? 0.0001 : params.twist);
+    gl.uniform1f(uOpacity, params.opacity);
+
+    gl.drawArrays(gl.POINTS, 0, Math.round(params.particles));
+
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
