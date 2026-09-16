@@ -1,0 +1,330 @@
+<title>Particle Creature</title>
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --panel:#111114;
+    --border:#232329;
+    --text:#e9e7ef;
+    --muted:#8b8a94;
+    --accent:#cfc9ff;
+    --dot:#f4f2ff;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f4f3f6;
+      --panel:#fbfaff;
+      --border:#dcdae3;
+      --text:#17161c;
+      --muted:#696873;
+      --accent:#5b4bd6;
+      --dot:#17161c;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f4f3f6;
+    --panel:#fbfaff;
+    --border:#dcdae3;
+    --text:#17161c;
+    --muted:#696873;
+    --accent:#5b4bd6;
+    --dot:#17161c;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a0a0c;
+    --panel:#111114;
+    --border:#232329;
+    --text:#e9e7ef;
+    --muted:#8b8a94;
+    --accent:#cfc9ff;
+    --dot:#f4f2ff;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Fraunces",Georgia,"Hiragino Mincho ProN",serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    padding:48px 16px 56px;
+    min-height:100dvh;
+  }
+
+  header{
+    text-align:center;
+    max-width:520px;
+  }
+  h1{
+    font-family:"Fraunces","Hiragino Mincho ProN",serif;
+    font-optical-sizing:auto;
+    font-style:italic;
+    font-weight:520;
+    font-size:clamp(28px,6vw,42px);
+    letter-spacing:0.01em;
+    margin:0 0 8px;
+    text-wrap:balance;
+    color:var(--text);
+  }
+  p.sub{
+    font-family:"JetBrains Mono","SF Mono",monospace;
+    font-size:12.5px;
+    line-height:1.7;
+    color:var(--muted);
+    margin:0;
+    letter-spacing:0.01em;
+  }
+
+  .stage{
+    position:relative;
+    width:min(88vw,440px);
+    aspect-ratio:1/1;
+    background:#09090b;
+    border:1px solid var(--border);
+    border-radius:6px;
+    box-shadow:0 30px 70px -35px rgba(0,0,0,0.55);
+    overflow:hidden;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  .stage-label{
+    position:absolute;
+    left:10px;
+    bottom:9px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:rgba(233,231,239,0.55);
+    pointer-events:none;
+  }
+
+  .meta{
+    width:min(88vw,440px);
+    display:flex;
+    justify-content:space-between;
+    font-family:"JetBrains Mono",monospace;
+    font-size:11px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .meta strong{
+    color:var(--accent);
+    font-weight:500;
+  }
+
+  details{
+    width:min(88vw,600px);
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--panel);
+    overflow:hidden;
+  }
+  summary{
+    cursor:pointer;
+    list-style:none;
+    padding:12px 16px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{
+    content:"表示";
+    color:var(--accent);
+    font-size:10.5px;
+  }
+  details[open] summary::after{content:"閉じる";}
+  pre{
+    margin:0;
+    padding:0 16px 16px;
+    font-family:"JetBrains Mono",monospace;
+    font-size:11.5px;
+    line-height:1.65;
+    color:var(--text);
+    overflow-x:auto;
+    white-space:pre;
+  }
+  pre .c{color:var(--muted);}
+
+  @media (prefers-reduced-motion: reduce){
+    canvas{filter:none;}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,420;1,9..144,560&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<header>
+  <h1>Particle Creature</h1>
+  <p class="sub">10,000 points · triangle-function field · WebGL2</p>
+</header>
+
+<div class="stage">
+  <canvas id="gl"></canvas>
+  <div class="stage-label">gl.POINTS — 400×400 space</div>
+</div>
+
+<div class="meta">
+  <span>particles <strong id="countOut">10000</strong></span>
+  <span>Δt <strong>π/20</strong> / frame</span>
+  <span>t = <strong id="tOut">0.00</strong></span>
+</div>
+
+<details>
+  <summary>元コード / GLSL 変換</summary>
+  <pre><span class="c">// 元の p5.js ゴルフコード</span>
+a=(m,d=mag(k=9*cos(i*5)*sin(i),e=cos(i*3)*cos(i*2)*9)**3/1999+1.5-sin(t/2+m)**3/3)=>
+  point(99*sin(c=d/16-t/48+m)+k*(p=d**sin(d*d-t+m))+200,
+        99*sin(c*4)+e*p+200)
+t=0,draw=$=>{
+  t||createCanvas(w=400,w);
+  background(9).stroke(w,96);
+  for(t+=PI/20,i=1e4;i--;) a(i%16*13)
+}
+
+<span class="c">// 頂点シェーダーへの移植（gl_VertexID を i として使用）</span>
+float i = float(gl_VertexID);
+float m = mod(i, 16.0) * 13.0;
+float k = 9.0 * cos(i*5.0) * sin(i);
+float e = cos(i*3.0) * cos(i*2.0) * 9.0;
+float mg = sqrt(k*k + e*e);
+float d = pow(mg,3.0)/1999.0 + 1.5 - pow(sin(uT/2.0+m),3.0)/3.0;
+float c = d/16.0 - uT/48.0 + m;
+float p = pow(d, sin(d*d - uT + m));
+vec2 pos = vec2(99.0*sin(c) + k*p + 200.0,
+                 99.0*sin(c*4.0) + e*p + 200.0);</pre>
+</details>
+
+<script>
+(() => {
+  const canvas = document.getElementById('gl');
+  const gl = canvas.getContext('webgl2', { antialias: true, alpha: false });
+  if (!gl) {
+    canvas.replaceWith(Object.assign(document.createElement('p'), {
+      textContent: 'WebGL2 に対応していないブラウザです。',
+      style: 'font-family:monospace;color:var(--muted);padding:40px;'
+    }));
+    return;
+  }
+
+  const COUNT = 10000;
+  const SPACE = 400; // original createCanvas(400,400) coordinate space
+
+  const vertSrc = `#version 300 es
+  precision highp float;
+  uniform float uT;
+  uniform vec2 uResolution;
+  uniform float uPointSize;
+
+  void main() {
+    float i = float(gl_VertexID);
+    float m = mod(i, 16.0) * 13.0;
+
+    float k = 9.0 * cos(i * 5.0) * sin(i);
+    float e = cos(i * 3.0) * cos(i * 2.0) * 9.0;
+    float mg = sqrt(k * k + e * e);
+
+    float d = pow(mg, 3.0) / 1999.0 + 1.5 - pow(sin(uT / 2.0 + m), 3.0) / 3.0;
+    float c = d / 16.0 - uT / 48.0 + m;
+    float p = pow(d, sin(d * d - uT + m));
+
+    float x = 99.0 * sin(c) + k * p + 200.0;
+    float y = 99.0 * sin(c * 4.0) + e * p + 200.0;
+
+    vec2 clip = (vec2(x, y) / uResolution) * 2.0 - 1.0;
+    clip.y = -clip.y;
+
+    gl_Position = vec4(clip, 0.0, 1.0);
+    gl_PointSize = uPointSize;
+  }`;
+
+  const fragSrc = `#version 300 es
+  precision highp float;
+  out vec4 fragColor;
+  void main() {
+    vec2 uv = gl_PointCoord - 0.5;
+    float d = length(uv);
+    if (d > 0.5) discard;
+    float a = smoothstep(0.5, 0.15, d) * 0.376;
+    fragColor = vec4(1.0, 1.0, 1.0, a);
+  }`;
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(sh));
+    }
+    return sh;
+  }
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, vertSrc));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fragSrc));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    throw new Error(gl.getProgramInfoLog(prog));
+  }
+  gl.useProgram(prog);
+
+  const uT = gl.getUniformLocation(prog, 'uT');
+  const uResolution = gl.getUniformLocation(prog, 'uResolution');
+  const uPointSize = gl.getUniformLocation(prog, 'uPointSize');
+
+  gl.uniform2f(uResolution, SPACE, SPACE);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+  // a bare VAO is required in WebGL2 to issue a vertex-id-only draw
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+
+  const bgVal = 9 / 255;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const size = Math.round(canvas.clientWidth * dpr);
+    if (canvas.width !== size || canvas.height !== size) {
+      canvas.width = size;
+      canvas.height = size;
+      gl.viewport(0, 0, size, size);
+      gl.uniform1f(uPointSize, Math.max(1.4, 1.6 * dpr));
+    }
+  }
+
+  let t = 0;
+  const tOut = document.getElementById('tOut');
+  document.getElementById('countOut').textContent = COUNT.toLocaleString();
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step = reduceMotion ? 0 : Math.PI / 20;
+
+  function frame() {
+    resize();
+    t += step;
+
+    gl.clearColor(bgVal, bgVal, bgVal, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uT, t);
+    gl.drawArrays(gl.POINTS, 0, COUNT);
+
+    tOut.textContent = t.toFixed(2);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  window.addEventListener('resize', resize);
+})();
+</script>
